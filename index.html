@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Lexicon</title>
+<meta name="theme-color" content="#12211C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lexicon">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&family=Courier+Prime:wght@400;700&display=swap');
+
+:root{
+  --pine:#12211C; --pine-2:#2C3E37; --mute:#6E7A73;
+  --bone:#E8E5DA; --card:#F3F1E8; --line:rgba(18,33,28,.14);
+  --verd:#2A6C60; --plum:#7B3352; --gold:#96762B;
+  --serif:'Newsreader',Charter,Georgia,serif;
+  --mono:'Courier Prime','Courier New',monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overscroll-behavior:none}
+body{
+  background:var(--bone);color:var(--pine);font-family:var(--serif);
+  display:flex;flex-direction:column;height:100dvh;overflow:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:none;padding:0;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--verd);outline-offset:2px}
+
+.lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+
+header{display:flex;justify-content:space-between;align-items:baseline;
+  padding:calc(10px + env(safe-area-inset-top)) 18px 10px;border-bottom:1px solid var(--line);flex:none}
+header b{font-family:var(--mono);font-size:11px;letter-spacing:.3em}
+
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 34px}
+
+nav{flex:none;display:flex;background:var(--pine);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;padding:13px 4px 14px;color:rgba(232,229,218,.45);font-family:var(--mono);
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;display:flex;flex-direction:column;
+  align-items:center;gap:5px}
+nav button .dot{width:5px;height:5px;border-radius:1px;background:transparent}
+nav button[data-on="1"]{color:#F3F1E8}
+nav button[data-on="1"] .dot{background:#F3F1E8}
+
+.field{display:flex;gap:8px}
+.field input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:2px;
+  padding:13px 14px;font-size:19px;font-family:var(--serif)}
+.field input::placeholder{color:#A6A395}
+.go{background:var(--pine);color:var(--card);border-radius:2px;padding:0 16px;min-width:78px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.go:disabled{opacity:.4}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:2px;
+  box-shadow:3px 3px 0 rgba(18,33,28,.07);padding:18px 18px 14px}
+.in{animation:in .42s cubic-bezier(.2,.8,.3,1) both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.cardtop{display:flex;justify-content:space-between;color:var(--mute);margin-bottom:12px}
+.word{font-size:34px;line-height:1.08;font-weight:400;letter-spacing:-.01em;word-break:break-word;margin:0}
+.say{font-family:var(--mono);font-size:11.5px;color:var(--mute);margin-top:6px}
+.pos{font-style:italic;font-size:15px;color:var(--pine-2);margin-top:9px}
+.def{font-size:17.5px;line-height:1.55;margin:8px 0 0}
+.use{margin-top:14px;padding:11px 12px;border-left:2px solid var(--verd);
+  background:rgba(42,108,96,.06);font-style:italic;font-size:16px;line-height:1.5}
+.syn{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.syn i{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--pine-2);
+  border:1px solid var(--line);border-radius:2px;padding:3px 7px}
+.note{margin-top:12px;font-size:14.5px;line-height:1.5;color:var(--pine-2);
+  border-top:1px dashed var(--line);padding-top:10px}
+
+.gauge{display:flex;align-items:center;gap:9px;margin-top:16px;border-top:1px solid var(--line);padding-top:11px}
+.pips{display:flex;gap:4px}
+.pips i{width:13px;height:6px;border:1px solid var(--pine);border-radius:1px}
+.pips i[data-f="1"]{background:var(--pine)}
+.gauge small{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mute);margin-left:auto}
+.seal{color:var(--gold);border:1px solid var(--gold);border-radius:2px;padding:2px 6px;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.16em}
+
+.toast{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:12px;
+  padding:10px 12px;background:var(--pine);color:var(--card);border-radius:2px;animation:in .3s ease both}
+.toast button{color:var(--card);text-decoration:underline}
+
+.row{width:100%;text-align:left;display:flex;gap:12px;align-items:baseline;padding:13px 2px;
+  border-bottom:1px solid var(--line)}
+.row .no{font-family:var(--mono);font-size:10px;color:var(--mute);width:34px;flex:none}
+.row .w{font-size:19px}
+.row .d{font-size:14px;color:var(--mute);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .st{margin-left:auto;flex:none}
+.duedot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--plum);margin-left:5px}
+
+.filters{display:flex;gap:6px;margin:14px 0 4px;overflow-x:auto}
+.filters button{border:1px solid var(--line);border-radius:2px;padding:6px 10px;font-family:var(--mono);
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);white-space:nowrap}
+.filters button[data-on="1"]{background:var(--pine);color:var(--card);border-color:var(--pine)}
+
+.prompt{font-size:20px;line-height:1.5;margin:6px 0 0}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:2px;padding:13px 14px;margin-top:9px;font-size:16.5px;line-height:1.4}
+.opt[data-s="right"]{border-color:var(--verd);background:rgba(42,108,96,.12)}
+.opt[data-s="wrong"]{border-color:var(--plum);background:rgba(123,51,82,.1)}
+
+.btn{display:block;width:100%;border:1px solid var(--pine);border-radius:2px;padding:14px;margin-top:10px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.btn[data-fill="1"]{background:var(--pine);color:var(--card)}
+.btn[data-tone="plum"]{border-color:var(--plum);color:var(--plum)}
+.btn[data-tone="verd"]{border-color:var(--verd);color:var(--verd)}
+.btn:disabled{opacity:.4}
+.two{display:flex;gap:10px}
+
+.meter{display:flex;gap:3px;margin-bottom:16px}
+.meter i{flex:1;height:3px;background:var(--line);border-radius:2px}
+.meter i[data-f="1"]{background:var(--pine)}
+
+.verdict{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:16px}
+
+.empty{text-align:center;padding:44px 16px;color:var(--mute)}
+.empty p{font-size:17px;line-height:1.5;margin:0 0 6px}
+.big{font-size:30px;color:var(--pine)}
+
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--line);border-top-color:var(--pine);
+  border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+.go .spin{border-color:rgba(243,241,232,.3);border-top-color:#F3F1E8}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.tools{margin-top:26px;border-top:1px solid var(--line);padding-top:14px}
+.tools h3{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mute);margin:0 0 10px;font-weight:400}
+textarea{width:100%;height:88px;margin-top:10px;padding:10px;border-radius:2px;border:1px solid var(--line);
+  background:var(--card);color:var(--pine);font-family:var(--mono);font-size:11px;resize:vertical}
+.keyfield{width:100%;background:var(--card);border:1px solid var(--line);border-radius:2px;
+  padding:11px 12px;font-family:var(--mono);font-size:12px}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <b>LEXICON</b>
+  <span class="lbl" id="count"></span>
+</header>
+
+<main id="view"></main>
+
+<nav id="nav">
+  <button data-act="tab" data-t="lookup"><span class="dot"></span>Look up</button>
+  <button data-act="tab" data-t="deck"><span class="dot"></span>Drawer</button>
+  <button data-act="tab" data-t="review"><span class="dot"></span><span id="revlabel">Review</span></button>
+</nav>
+
+<script>
+/* ================================ state ================================ */
+const DAY = 86400000;
+const STAGES = [0, DAY, 3*DAY, 7*DAY, 21*DAY];   // wait before a word at stage n+1 returns
+const DECK_KEY = 'lexicon.deck.v1';
+const API_KEY  = 'lexicon.apikey';
+const MODEL    = 'claude-haiku-4-5-20251001';    // swap to claude-sonnet-5 for richer entries
+
+let words = [], nextNo = 1;
+let tab = 'lookup';
+let look = { busy:false, err:null, miss:null, shownId:null, toast:null };
+let deckUI = { q:'', filter:'all', open:null, out:null, msg:'' };
+let session = null, quiz = null;
+
+function load(){
+  try{
+    const d = JSON.parse(localStorage.getItem(DECK_KEY));
+    if(d && Array.isArray(d.words)){ words = d.words; nextNo = d.nextNo || words.length+1; }
+  }catch(e){ console.warn('load failed', e); }
+}
+function save(){
+  try{ localStorage.setItem(DECK_KEY, JSON.stringify({words, nextNo})); }
+  catch(e){ console.warn('save failed', e); }
+}
+
+/* =============================== helpers =============================== */
+const esc = s => String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => (s||'').toLowerCase().replace(/[^a-z]/g,'');
+const pad = n => String(n).padStart(3,'0');
+const isDue = w => !w.mastered && (w.dueAt??0) <= Date.now();
+
+function lev(a,b){
+  let prev = Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++)
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur;
+  }
+  return prev[b.length];
+}
+function matches(guess, answer){
+  const g=norm(guess), a=norm(answer);
+  if(!g) return false;
+  return g===a || (a.length>=5 && lev(g,a)<=1);
+}
+function blankOut(sentence, word){
+  if(!sentence) return sentence;
+  const stem = word.replace(/[^a-zA-Z]/g,'').slice(0, Math.max(4, word.length-3));
+  if(!stem) return sentence;
+  try{ return sentence.replace(new RegExp('\\b'+stem+'[a-zA-Z]*','gi'),'————'); }
+  catch(e){ return sentence; }
+}
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function whenBack(w){
+  if(!w) return '';
+  if(w.mastered) return 'retired';
+  const ms=(w.dueAt??0)-Date.now();
+  if(ms<=0) return 'due now';
+  const d=Math.round(ms/DAY);
+  if(d<1) return 'due today';
+  return d===1 ? 'due tomorrow' : 'due in '+d+' days';
+}
+
+/* ============================== definitions ============================= */
+const SYSTEM = `You are a precise lexicographer. Reply with ONLY a JSON object, no markdown fences, no preamble.
+
+Real word or phrase:
+{"valid":true,"word":"<canonical spelling>","pronunciation":"<simple respelling>","pos":"<part of speech>","definition":"<one clear sentence, plain language, do not restate the word>","example":"<one natural sentence using it, showing its connotation>","synonyms":["<up to 3>"],"note":"<one short sentence on nuance, register or common misuse; empty string if nothing worth saying>"}
+
+Not a word:
+{"valid":false,"suggestion":"<closest real word or empty string>","message":"<short line explaining>"}
+
+Silently fix obvious misspellings.`;
+
+async function claudeEntry(term, key){
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'content-type':'application/json',
+      'x-api-key':key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({ model:MODEL, max_tokens:600, system:SYSTEM,
+      messages:[{role:'user', content:term}] })
+  });
+  if(!res.ok) throw new Error('api '+res.status);
+  const data = await res.json();
+  const text = (data.content||[]).map(c=>c.type==='text'?c.text:'').join('');
+  return JSON.parse(text.replace(/```json|```/g,'').trim());
+}
+
+async function freeEntry(term){
+  const res = await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(term.trim()));
+  if(res.status===404) return { valid:false, suggestion:'', message:'No entry for that. Check the spelling, or add a Claude key in the Drawer for smarter lookups.' };
+  if(!res.ok) throw new Error('dict '+res.status);
+  const json = await res.json();
+  const first = json[0];
+  const phon = first.phonetic || (first.phonetics||[]).map(p=>p.text).find(Boolean) || '';
+  const meanings = json.flatMap(e => (e.meanings||[]));
+  const pick = meanings.find(m => (m.definitions||[]).some(d=>d.example)) || meanings[0];
+  if(!pick) return { valid:false, suggestion:'', message:'That word came back empty.' };
+  const def = (pick.definitions||[]).find(d=>d.example) || pick.definitions[0];
+  return {
+    valid:true, word:first.word, pronunciation:phon, pos:pick.partOfSpeech||'',
+    definition:def.definition||'', example:def.example||'',
+    synonyms:(def.synonyms||pick.synonyms||[]).slice(0,3), note:''
+  };
+}
+
+const getKey = () => localStorage.getItem(API_KEY) || '';
+const lookupWord = term => getKey() ? claudeEntry(term, getKey()) : freeEntry(term);
+
+/* ================================ deck ops ============================== */
+function addWord(e){
+  const w = {
+    id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
+    no: nextNo++,
+    word: e.word, pronunciation: e.pronunciation||'', pos: e.pos||'',
+    definition: e.definition||'', example: e.example||'',
+    synonyms: Array.isArray(e.synonyms)? e.synonyms.slice(0,3):[], note: e.note||'',
+    addedAt: Date.now(), stage:1, dueAt: Date.now(), right:0, wrong:0, mastered:false
+  };
+  words.push(w); save();
+  return w;
+}
+function removeWord(id){ words = words.filter(w=>w.id!==id); save(); }
+function resetWord(id){
+  const w = words.find(x=>x.id===id);
+  if(w){ w.mastered=false; w.stage=1; w.dueAt=Date.now(); save(); }
+}
+function grade(id, right){
+  const w = words.find(x=>x.id===id);
+  if(!w) return;
+  if(!right){ w.stage=1; w.wrong++; w.mastered=false; w.dueAt=Date.now()+600000; }
+  else if(w.stage>=5){ w.mastered=true; w.right++; w.dueAt=null; }
+  else { w.stage++; w.right++; w.dueAt=Date.now()+STAGES[w.stage-1]; }
+  save();
+}
+
+/* ============================== components ============================== */
+function gaugeHTML(w){
+  if(w.mastered) return `<div class="gauge"><span class="seal">RETIRED</span><small>${esc(whenBack(w))}</small></div>`;
+  let pips=''; for(let i=1;i<=5;i++) pips += `<i data-f="${i<=w.stage?1:0}"></i>`;
+  return `<div class="gauge"><span class="lbl" style="color:var(--mute)">Stage ${w.stage}/5</span>
+    <div class="pips">${pips}</div><small>${esc(whenBack(w))}</small></div>`;
+}
+function cardHTML(w, {gauge=true, animate=false}={}){
+  const date = new Date(w.addedAt).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  return `<article class="card${animate?' in':''}">
+    <div class="cardtop"><span class="lbl">No. ${pad(w.no)}</span><span class="lbl">${esc(date)}</span></div>
+    <h2 class="word">${esc(w.word)}</h2>
+    ${w.pronunciation?`<div class="say">${esc(w.pronunciation)}</div>`:''}
+    ${w.pos?`<div class="pos">${esc(w.pos)}</div>`:''}
+    <p class="def">${esc(w.definition)}</p>
+    ${w.example?`<div class="use">${esc(w.example)}</div>`:''}
+    ${(w.synonyms&&w.synonyms.length)?`<div class="syn">${w.synonyms.map(s=>`<i>${esc(s)}</i>`).join('')}</div>`:''}
+    ${w.note?`<p class="note">${esc(w.note)}</p>`:''}
+    ${gauge?gaugeHTML(w):''}
+  </article>`;
+}
+
+/* ================================ views ================================= */
+function lookupView(){
+  const cur = words.find(w=>w.id===look.shownId);
+  const due = words.filter(isDue).length;
+  let h = `<div class="field">
+    <input id="term" placeholder="Type a word" autocapitalize="none" autocorrect="off"
+      spellcheck="false" enterkeyhint="search" aria-label="Word to look up">
+    <button class="go" data-act="look">${look.busy?'<span class="spin"></span>':'Look up'}</button>
+  </div>`;
+
+  if(look.err) h += `<p class="note" style="border-top:none">${esc(look.err)}</p>`;
+
+  if(look.miss) h += `<div class="card in" style="margin-top:14px">
+    <p class="def" style="margin-top:0">${esc(look.miss.message)}</p>
+    ${look.miss.suggestion?`<button class="btn" data-fill="1" data-act="suggest" data-w="${esc(look.miss.suggestion)}">Look up “${esc(look.miss.suggestion)}”</button>`:''}
+  </div>`;
+
+  if(cur){
+    h += `<div style="margin-top:14px">${cardHTML(cur,{animate:true})}`;
+    if(look.toast==='added') h += `<div class="toast"><span class="lbl">Filed as No. ${pad(cur.no)}</span>
+      <button class="lbl" data-act="rm" data-id="${cur.id}">Remove</button></div>`;
+    if(look.toast==='known') h += `<div class="toast"><span class="lbl">Already in the drawer</span>
+      <button class="lbl" data-act="tab" data-t="review">Review</button></div>`;
+    h += `</div>`;
+  }
+
+  if(!cur && !look.miss && !look.busy){
+    h += `<div class="empty">${words.length===0
+      ? `<p>Nothing in the drawer yet.</p><p class="lbl">every word you look up gets filed for review</p>`
+      : `<p>${words.length} ${words.length===1?'word':'words'} filed.</p><p class="lbl">${due>0?due+' ready to review':'nothing due right now'}</p>`}</div>`;
+  }
+  return h;
+}
+
+function deckView(){
+  if(words.length===0){
+    return `<div class="empty"><p>The drawer is empty.</p><p class="lbl">look up a word and it lands here</p></div>` + toolsHTML();
+  }
+  return `<div class="field"><input id="search" value="${esc(deckUI.q)}" placeholder="Search the drawer"
+      autocapitalize="none" aria-label="Search saved words"></div>
+    <div class="filters" id="filters">${['all','due','learning','retired'].map(f=>{
+      const n = f==='all'?words.length : f==='due'?words.filter(isDue).length
+        : f==='learning'?words.filter(w=>!w.mastered).length : words.filter(w=>w.mastered).length;
+      return `<button data-act="filter" data-f="${f}" data-on="${deckUI.filter===f?1:0}">${f} · ${n}</button>`;
+    }).join('')}</div>
+    <div id="list">${listHTML()}</div>` + toolsHTML();
+}
+
+function listHTML(){
+  const f = deckUI.filter, q = deckUI.q.trim().toLowerCase();
+  const list = words
+    .filter(w => f==='due'?isDue(w) : f==='learning'?!w.mastered : f==='retired'?w.mastered : true)
+    .filter(w => !q || (w.word+' '+w.definition).toLowerCase().includes(q))
+    .sort((a,b)=>b.addedAt-a.addedAt);
+  if(!list.length) return `<div class="empty"><p class="lbl">nothing here</p></div>`;
+  return list.map(w => deckUI.open===w.id
+    ? `<div style="margin:14px 0">${cardHTML(w)}
+        <div class="two">
+          <button class="btn" data-act="close">Close</button>
+          ${w.mastered?`<button class="btn" data-tone="verd" data-act="reset" data-id="${w.id}">Put back</button>`:''}
+          <button class="btn" data-tone="plum" data-act="rm" data-id="${w.id}">Remove</button>
+        </div></div>`
+    : `<button class="row" data-act="open" data-id="${w.id}">
+        <span class="no">${pad(w.no)}</span>
+        <span style="min-width:0;flex:1">
+          <span class="w">${esc(w.word)}</span>${isDue(w)?'<span class="duedot"></span>':''}
+          <span class="d">${esc(w.definition)}</span>
+        </span>
+        <span class="st lbl" style="color:${w.mastered?'var(--gold)':'var(--mute)'}">${w.mastered?'◆':w.stage+'/5'}</span>
+      </button>`
+  ).join('');
+}
+
+function toolsHTML(){
+  const key = getKey();
+  return `<div class="tools">
+    <h3>Your words</h3>
+    <div class="two">
+      <button class="btn" data-act="copy">Copy backup</button>
+      <button class="btn" data-act="paste">Paste backup</button>
+    </div>
+    ${deckUI.msg?`<p class="lbl" style="margin-top:10px;color:var(--mute)">${esc(deckUI.msg)}</p>`:''}
+    ${deckUI.out==='out'?`<textarea id="backup" readonly>${esc(JSON.stringify({words,nextNo}))}</textarea>`:''}
+    ${deckUI.out==='in'?`<textarea id="backup" placeholder="Paste your backup text here"></textarea>
+      <button class="btn" data-fill="1" data-act="restore">Replace drawer with this backup</button>`:''}
+
+    <h3 style="margin-top:24px">Definitions</h3>
+    <p class="note" style="border-top:none;padding-top:0;margin-top:0">
+      ${key ? 'Written by Claude — richer definitions, usage notes and example sentences.'
+            : 'Coming from the free dictionary. Add an Anthropic API key for definitions written by Claude, with usage notes and better examples. The key stays on this phone.'}
+    </p>
+    ${key
+      ? `<button class="btn" data-tone="plum" data-act="clearkey">Remove key (…${esc(key.slice(-4))})</button>`
+      : `<input class="keyfield" id="apikey" placeholder="sk-ant-…" autocapitalize="none" autocorrect="off" spellcheck="false">
+         <button class="btn" data-act="savekey">Save key</button>`}
+  </div>`;
+}
+
+function buildQuestion(word){
+  const others = words.filter(w=>w.id!==word.id);
+  const same = others.filter(w=>w.pos===word.pos);
+  const bank = same.length>=3 ? same : others;
+  const canChoose = bank.length>=3;
+  const hasUse = !!word.example && blankOut(word.example, word.word)!==word.example;
+  const kinds = [];
+  if(canChoose) kinds.push('pickWord','pickWord','pickDef');
+  if(hasUse) kinds.push('fillIn','fillIn');
+  kinds.push('recall');
+  const kind = kinds[Math.floor(Math.random()*kinds.length)];
+  if(kind==='pickWord'||kind==='pickDef')
+    return { kind, id:word.id, options: shuffle([word, ...shuffle(bank).slice(0,3)]).map(w=>w.id) };
+  return { kind, id:word.id };
+}
+
+function startSession(practice){
+  const source = practice ? words.filter(w=>!w.mastered) : words.filter(isDue);
+  const chosen = shuffle(source).slice(0,15);
+  session = { queue: chosen.map(buildQuestion), i:0, right:0, wrong:0, practice, done:false };
+  quiz = { state:'asking', picked:null, wasRight:null };
+}
+
+function reviewView(){
+  const due = words.filter(isDue);
+  const learning = words.filter(w=>!w.mastered);
+
+  if(!session || session.done){
+    let head;
+    if(session && session.done)
+      head = `<p class="big">${session.right} of ${session.queue.length}</p><p class="lbl">${session.practice?'practice round':'reviewed'}</p>`;
+    else if(due.length)
+      head = `<p class="big">${due.length}</p><p class="lbl">${due.length===1?'word is due':'words are due'}</p>`;
+    else if(learning.length){
+      const soonest = [...learning].sort((a,b)=>(a.dueAt||0)-(b.dueAt||0))[0];
+      head = `<p>The drawer is clear.</p><p class="lbl">next word returns ${esc(whenBack(soonest).replace('due ',''))}</p>`;
+    } else head = `<p>Nothing to review.</p><p class="lbl">look a word up to start a drawer</p>`;
+
+    return `<div class="empty">${head}
+      ${due.length?`<button class="btn" data-fill="1" style="margin-top:22px" data-act="start" data-p="0">Start review</button>`:''}
+      ${learning.length?`<button class="btn" data-act="start" data-p="1">Practice anyway</button>`:''}
+      <p class="lbl" style="margin-top:26px;line-height:1.9;color:var(--mute)">
+        Right answers move a word up a stage — now, a day,<br>three days, a week, three weeks.<br>
+        Clear stage 5 and it retires. A miss sends it to stage 1.</p>
+    </div>`;
+  }
+
+  const q = session.queue[session.i];
+  const w = words.find(x=>x.id===q.id);
+  if(!w){ session.done=true; return reviewView(); }
+  const opts = (q.options||[]).map(id=>words.find(x=>x.id===id)).filter(Boolean);
+
+  let meter=''; for(let i=0;i<session.queue.length;i++) meter += `<i data-f="${i<=session.i?1:0}"></i>`;
+  let h = `<div class="meter">${meter}</div>`;
+
+  if(quiz.state==='asking'){
+    if(q.kind==='pickWord'){
+      h += `<span class="lbl" style="color:var(--mute)">Which word means this</span>
+        <p class="prompt">${esc(w.definition)}</p>
+        ${opts.map(o=>`<button class="opt" data-act="pick" data-id="${o.id}">${esc(o.word)}</button>`).join('')}`;
+    } else if(q.kind==='pickDef'){
+      h += `<span class="lbl" style="color:var(--mute)">What does it mean</span>
+        <p class="prompt" style="font-size:30px">${esc(w.word)}</p>
+        ${opts.map(o=>`<button class="opt" data-act="pick" data-id="${o.id}">${esc(o.definition)}</button>`).join('')}`;
+    } else if(q.kind==='fillIn'){
+      h += `<span class="lbl" style="color:var(--mute)">Fill the gap</span>
+        <p class="prompt" style="font-style:italic">${esc(blankOut(w.example,w.word))}</p>
+        <p class="def" style="color:var(--mute);font-size:15px">${esc(w.definition)}</p>
+        <div class="field" style="margin-top:12px">
+          <input id="answer" placeholder="The word" autocapitalize="none" autocorrect="off"
+            spellcheck="false" enterkeyhint="done" aria-label="Your answer"></div>
+        <button class="btn" data-fill="1" data-act="check">Check</button>
+        <button class="btn" data-tone="plum" data-act="grade" data-r="0">Skip — I don't know</button>`;
+    } else {
+      h += `<span class="lbl" style="color:var(--mute)">Name the word</span>
+        <p class="prompt">${esc(w.definition)}</p>
+        ${w.example?`<div class="use">${esc(blankOut(w.example,w.word))}</div>`:''}
+        <button class="btn" data-fill="1" style="margin-top:20px" data-act="reveal">Show the word</button>`;
+    }
+    return h;
+  }
+
+  // revealed
+  if(q.kind==='pickWord'||q.kind==='pickDef'){
+    h += opts.map(o=>{
+      const s = o.id===w.id ? 'right' : (o.id===quiz.picked ? 'wrong' : 'idle');
+      return `<div class="opt" data-s="${s}">${esc(q.kind==='pickWord'?o.word:o.definition)}</div>`;
+    }).join('');
+  }
+
+  if(quiz.wasRight===null){
+    h += cardHTML(w,{gauge:false,animate:true}) +
+      `<div class="two">
+        <button class="btn" data-tone="plum" data-act="grade" data-r="0">Missed it</button>
+        <button class="btn" data-tone="verd" data-act="grade" data-r="1">I knew it</button>
+      </div>`;
+    return h;
+  }
+
+  const verdict = session.practice
+    ? (quiz.wasRight?'Correct':'Missed')
+    : (quiz.wasRight ? (w.mastered?'Correct — retired from review':`Correct — stage ${w.stage} of 5`)
+                     : 'Missed — back to stage 1');
+  h += `<p class="verdict" style="color:${quiz.wasRight?'var(--verd)':'var(--plum)'}">${verdict}</p>`;
+  if(q.kind!=='recall') h += `<div style="margin-top:12px">${cardHTML(w)}</div>`;
+  h += `<button class="btn" data-fill="1" data-act="next">${session.i+1>=session.queue.length?'Finish':'Next'}</button>`;
+  return h;
+}
+
+/* ================================ render =============================== */
+function render(){
+  const due = words.filter(isDue).length;
+  document.getElementById('count').textContent =
+    words.length + (words.length===1?' entry':' entries') + (due?' · '+due+' due':'');
+  document.getElementById('revlabel').textContent = due ? 'Review '+due : 'Review';
+  document.querySelectorAll('#nav button').forEach(b =>
+    b.setAttribute('data-on', b.dataset.t===tab ? '1':'0'));
+
+  const view = document.getElementById('view');
+  view.innerHTML = tab==='lookup' ? lookupView() : tab==='deck' ? deckView() : reviewView();
+  view.scrollTop = 0;
+
+  const term = document.getElementById('term');
+  if(term) term.addEventListener('keydown', e => { if(e.key==='Enter') runLookup(term.value); });
+  const ans = document.getElementById('answer');
+  if(ans){ ans.addEventListener('keydown', e => { if(e.key==='Enter') check(); }); }
+  const search = document.getElementById('search');
+  if(search) search.addEventListener('input', e => {
+    deckUI.q = e.target.value; deckUI.open = null;
+    document.getElementById('list').innerHTML = listHTML();
+  });
+}
+
+/* ================================ actions ============================== */
+async function runLookup(raw){
+  const t = (raw||'').trim();
+  if(!t || look.busy) return;
+  document.activeElement && document.activeElement.blur();
+  look = { busy:true, err:null, miss:null, shownId:null, toast:null };
+  render();
+  try{
+    const e = await lookupWord(t);
+    if(!e || !e.valid){ look.miss = e || {message:'That lookup came back empty.'}; }
+    else{
+      const existing = words.find(w=>norm(w.word)===norm(e.word));
+      if(existing){ look.shownId = existing.id; look.toast='known'; }
+      else { look.shownId = addWord(e).id; look.toast='added'; }
+    }
+  }catch(err){
+    console.error(err);
+    look.err = getKey()
+      ? "That lookup didn't come back. Check the key and your connection, then try again."
+      : "That lookup didn't come back. Check your connection and try again.";
+  }
+  look.busy = false;
+  render();
+}
+
+function answer(right, picked){
+  quiz.picked = picked ?? null;
+  quiz.wasRight = right;
+  quiz.state = 'shown';
+  if(!session.practice) grade(session.queue[session.i].id, right);
+  session[right?'right':'wrong']++;
+  render();
+}
+function check(){
+  const el = document.getElementById('answer');
+  if(!el || !el.value.trim()) return;
+  const w = words.find(x=>x.id===session.queue[session.i].id);
+  answer(matches(el.value, w.word));
+}
+
+document.body.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const a = el.dataset.act;
+
+  if(a==='tab'){ tab = el.dataset.t; render(); return; }
+  if(a==='look'){ runLookup((document.getElementById('term')||{}).value||''); return; }
+  if(a==='suggest'){ runLookup(el.dataset.w); return; }
+  if(a==='rm'){ removeWord(el.dataset.id); look.shownId=null; look.toast=null; deckUI.open=null; render(); return; }
+  if(a==='open'){ deckUI.open = el.dataset.id; render(); return; }
+  if(a==='close'){ deckUI.open = null; render(); return; }
+  if(a==='reset'){ resetWord(el.dataset.id); render(); return; }
+  if(a==='filter'){ deckUI.filter = el.dataset.f; deckUI.open=null; render(); return; }
+
+  if(a==='start'){ startSession(el.dataset.p==='1'); render(); return; }
+  if(a==='pick'){
+    const w = words.find(x=>x.id===session.queue[session.i].id);
+    answer(el.dataset.id===w.id, el.dataset.id); return;
+  }
+  if(a==='check'){ check(); return; }
+  if(a==='reveal'){ quiz.state='shown'; render(); return; }
+  if(a==='grade'){ answer(el.dataset.r==='1'); return; }
+  if(a==='next'){
+    if(session.i+1>=session.queue.length) session.done = true;
+    else { session.i++; quiz = {state:'asking', picked:null, wasRight:null}; }
+    render(); return;
+  }
+
+  if(a==='copy'){
+    deckUI.out='out'; deckUI.msg='';
+    const payload = JSON.stringify({words,nextNo});
+    navigator.clipboard && navigator.clipboard.writeText(payload)
+      .then(()=>{ deckUI.msg='Copied to the clipboard'; render(); })
+      .catch(()=>{ deckUI.msg='Select the text below and copy it'; render(); });
+    render(); return;
+  }
+  if(a==='paste'){ deckUI.out='in'; deckUI.msg=''; render(); return; }
+  if(a==='restore'){
+    const el2 = document.getElementById('backup');
+    try{
+      const d = JSON.parse(el2.value);
+      if(!Array.isArray(d.words)) throw new Error();
+      words = d.words; nextNo = d.nextNo || words.length+1; save();
+      deckUI.msg = 'Restored '+words.length+' entries'; deckUI.out=null;
+    }catch(err){ deckUI.msg = "That text isn't a backup. Paste the whole thing, braces included."; }
+    render(); return;
+  }
+  if(a==='savekey'){
+    const v = (document.getElementById('apikey')||{}).value||'';
+    if(v.trim()){ localStorage.setItem(API_KEY, v.trim()); deckUI.msg='Key saved on this phone'; }
+    render(); return;
+  }
+  if(a==='clearkey'){ localStorage.removeItem(API_KEY); deckUI.msg='Key removed'; render(); return; }
+});
+
+/* ================================= boot ================================= */
+load();
+render();
+if('serviceWorker' in navigator)
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
